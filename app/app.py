@@ -100,6 +100,10 @@ def addRatings():
     	rating = request.args.get('rating')
     else:
     	return jsonify({"error":"mandatory parameter rating not added"})
+    if not rating.isnumeric():
+    	return jsonify({"error":"rating should be numeric and postive"})
+    if int(rating) <1 or int(rating) >5:
+    	return jsonify({"error":"rating should be between 1 and 5"})
     starting_ind = mycol.find( { "_id": ObjectId(songid) } )
     new_ratings = [rating]
     for el in starting_ind:
