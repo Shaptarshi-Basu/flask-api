@@ -1,4 +1,4 @@
-# flask-api
+# Flask-api
 
-## Basic Flask API with dockerized mongodb database
-## Use instructions.txt to run the application
+#### Basic Flask API with dockerized mongodb database
+#### Use instructions.txt to run the application
