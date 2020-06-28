@@ -59,7 +59,7 @@ def getAvgDifficulty():
     if 'level' in request.args:
     	level = request.args.get('level')
     else:
-    	level = 0
+    	level = "0"
     if not level.isnumeric():
     	return jsonify({"error": "level value should be numeric"})
     for x in mydoc:
