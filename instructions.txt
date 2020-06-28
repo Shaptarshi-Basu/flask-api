@@ -6,6 +6,10 @@ cd ..
 docker-compose up -d
 python app.py
 
+
+run tests with 
+py.test
+
 Prerequisites
 python ,docker
 My python version was Python 3.6.4
