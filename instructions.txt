@@ -1,0 +1,10 @@
+cd app
+pip install -r requirements.txt
+cd mongo-seed
+docker build .
+cd ..
+docker-compose up -d
+python app.py
+
+
+My python version was Python 3.6.4
