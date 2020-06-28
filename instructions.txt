@@ -6,5 +6,6 @@ cd ..
 docker-compose up -d
 python app.py
 
-
+Prerequisites
+python ,docker
 My python version was Python 3.6.4
