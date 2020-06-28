@@ -16,13 +16,21 @@ def getSongs():
 	offset = 0
 	limit = 5
 	if 'offset' in request.args:
-		offset = int(request.args.get('offset'))
+		offset_value = request.args.get('offset')
+		if not offset_value.isnumeric():
+			return jsonify({"error": "offset value should be numeric and postive"})
+		offset = int(offset_value)
 	if 'limit' in request.args:
-		limit = int(request.args.get('limit'))
+		limit_value = request.args.get('limit')
+		if not limit_value.isnumeric():
+			return jsonify({"error": "limit value should be numeric"})
+		limit = int(limit_value)
 	mycol = getCollection()
 	staring_id = mycol.find().sort('_id',pymongo.ASCENDING)
-	last_id = staring_id[offset]['_id']
-	print(last_id)	 
+	try:
+		last_id = staring_id[offset]['_id']
+	except IndexError as e:
+		return jsonify({"error":"index out of bound for offset"})
 	mydoc = mycol.find({ '_id': { '$gte': last_id } }).sort('_id', pymongo.ASCENDING).limit(limit)
 	output = []
 	for x in mydoc:
@@ -52,21 +60,29 @@ def getAvgDifficulty():
     	level = request.args.get('level')
     else:
     	level = 0
+    if not level.isnumeric():
+    	return jsonify({"error": "level value should be numeric"})
     for x in mydoc:
     	if x['difficulty'] > float(level):
     		print(x['difficulty'])
     		difficulty =difficulty + x['difficulty']
     		count = count + 1
-    avg = difficulty / count
-    return jsonify({"average Value": str(avg)})       
+    if count != 0:
+    	avg = difficulty / count
+    	return jsonify({"average Value": str(avg)})
+    else:
+    	return jsonify({"error": "No value above that level"})	       
 
 @app.route('/songs/search')
 def getSearchResults():
     mycol = getCollection()
     mydoc = mycol.find().sort('_id', pymongo.ASCENDING)
     song_list = []
+    if 'message' not in request.args:
+    	return jsonify({"error": "Search parameter should be present"})
     searchCtr = request.args.get('message')
-    count = 0
+    if len(searchCtr) == 0 :
+    	return jsonify({"error": "Search parameter cannot be empty"})
     for x in mydoc:
     	if  searchCtr.lower() in x['artist'].lower() or searchCtr.lower() in x['title'].lower() :
     		x["_id"]= str(x["_id"])
@@ -78,8 +94,12 @@ def addRatings():
     mycol = getCollection()
     if 'song_id' in request.args:
     	songid = request.args.get('song_id')
+    else:
+    	 return jsonify({"error":"mandatory parameter song_id not added"})
     if 'rating' in request.args:
     	rating = request.args.get('rating')
+    else:
+    	return jsonify({"error":"mandatory parameter rating not added"})
     starting_ind = mycol.find( { "_id": ObjectId(songid) } )
     new_ratings = [rating]
     for el in starting_ind:
