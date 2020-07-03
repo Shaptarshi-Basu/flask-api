@@ -53,20 +53,16 @@ def getAvgDifficulty():
     # parameter 'varname' is specified
     # parameter 'varname' is NOT specified
     mycol = getCollection()
-    mydoc = mycol.find().sort('_id', pymongo.ASCENDING)
     difficulty = 0
     count = 0
     if 'level' in request.args:
     	level = request.args.get('level')
     else:
     	level = "0"
-    if not level.isnumeric():
-    	return jsonify({"error": "level value should be numeric"})
+    mydoc = mycol.find({'difficulty': {'$gte': int(level)}})
     for x in mydoc:
-    	if x['difficulty'] > float(level):
-    		print(x['difficulty'])
-    		difficulty =difficulty + x['difficulty']
-    		count = count + 1
+    	difficulty =difficulty + x['difficulty']
+    	count = count + 1
     if count != 0:
     	avg = difficulty / count
     	return jsonify({"average Value": str(avg)})
@@ -119,7 +115,7 @@ def addRatings():
     return jsonify({"updated":str(songid)})
 
 @app.route("/songs/avg/rating/<song_id>")
-def data(song_id):
+def getAvgRating(song_id):
 	mycol = getCollection()
 	least_rating = 0
 	max_rating = 0
@@ -127,6 +123,11 @@ def data(song_id):
 	count = 0
 	starting_ind = mycol.find( { "_id": ObjectId(song_id) } )
 	for el in starting_ind:
+		if 'ratings' not in el:
+			least_rating = "NA"
+			avg_rating ="NA"
+			max_rating ="NA"
+			break
 		least_rating = el['ratings'][0]
 		max_rating = el['ratings'][len(el['ratings'])-1]
 		ratings = el ['ratings']
